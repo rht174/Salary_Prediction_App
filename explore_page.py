@@ -11,14 +11,19 @@ def shorten_categories(categories, cutoff):
             categorical_map[categories.index[i]] = 'Other'
     return categorical_map
 
-
 def clean_experience(x):
-    if x ==  'More than 50 years':
+    if x == 'More than 50 years':
         return 50
     if x == 'Less than 1 year':
         return 0.5
     return float(x)
 
+def country_rename(x):
+    if x == 'United States of America':
+        return 'United States'
+    if x == 'United Kingdom of Great Britain and Northern Ireland':
+        return 'United Kingdom'
+    return x
 
 def clean_education(x):
     if 'Bachelor’s degree' in x:
@@ -29,25 +34,33 @@ def clean_education(x):
         return 'Post grad'
     return 'Less than a Bachelors'
 
-
 @st.cache
 def load_data():
     df = pd.read_csv("survey_results_public.csv")
-    df = df[["Country", "EdLevel", "YearsCodePro", "Employment", "ConvertedComp"]]
-    df = df[df["ConvertedComp"].notnull()]
+    
+    df = df[["Country", "EdLevel", "YearsCodePro", "Employment", "ConvertedCompYearly"]]
+    df = df.rename({"ConvertedCompYearly" : "Salary" }, axis =1)
+    df = df[df["Salary"].notnull()]
+
     df = df.dropna()
+
     df = df[df["Employment"] == "Employed full-time"]
     df = df.drop("Employment", axis=1)
 
-    country_map = shorten_categories(df.Country.value_counts(), 400)
-    df["Country"] = df["Country"].map(country_map)
-    df = df[df["ConvertedComp"] <= 250000]
-    df = df[df["ConvertedComp"] >= 10000]
-    df = df[df["Country"] != "Other"]
+    country_map = shorten_categories(df.Country.value_counts(), 740)
+    df['Country'] = df['Country'].map(country_map)
 
-    df["YearsCodePro"] = df["YearsCodePro"].apply(clean_experience)
-    df["EdLevel"] = df["EdLevel"].apply(clean_education)
-    df = df.rename({"ConvertedComp": "Salary"}, axis=1)
+    df['Country'] = df['Country'].apply(country_rename)
+
+    df = df[df["Salary"] <= 250000]
+    df = df[df["Salary"] >= 10000]
+    df = df[df['Country'] != 'Other']
+
+    df['YearsCodePro'] = df['YearsCodePro'].apply(clean_experience)
+    df['EdLevel'] = df['EdLevel'].apply(clean_education)
+  
+
+
     return df
 
 df = load_data()
@@ -57,7 +70,7 @@ def show_explore_page():
 
     st.write(
         """
-    ### Stack Overflow Developer Survey 2020
+    ### Stack Overflow Developer Survey 2021
     """
     )
 
@@ -70,7 +83,7 @@ def show_explore_page():
     st.write("""#### Number of Data from different countries""")
 
     st.pyplot(fig1)
-    
+
     st.write(
         """
     #### Mean Salary Based On Country
