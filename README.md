@@ -7,9 +7,9 @@ Application to predict salary of an employee based on basic information like exp
 it conducts every year. Stack Overflow annual developer survey include over 70,000 responses to curate the whole data. for csv file please refer to https://insights.stackoverflow.com/survey.
 
  - Try Out the app
-  ```sh
-  https://rishabh422tiwari-salary-prediction-app-7ytcny.streamlitapp.com/
-  ```
+  
+  https://rht174-salary-prediction-app-streamlit-app-rqsiqe.streamlitapp.com/
+  
 
 This is how end application would look like :
 
